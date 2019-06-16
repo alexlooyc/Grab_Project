@@ -1,8 +1,6 @@
 
 # coding: utf-8
 
-# In[1]:
-
 
 ## Check GPU ##
 import tensorflow as tf
@@ -12,20 +10,8 @@ if device_name != '/device:GPU:0':
 print('Found GPU at: {}'.format(device_name))
 
 
-# In[2]:
-
-
 print(tf.keras.__version__)
 print(tf.__version__)
-
-
-# In[3]:
-
-
-ls
-
-
-# In[4]:
 
 
 # Pre-Processing Steps taken from foamliu on his github repo
@@ -198,15 +184,6 @@ if __name__ == '__main__':
     # shutil.rmtree('devkit')
 
 
-# In[4]:
-
-
-
-
-
-# In[5]:
-
-
 ## Parameters ###
 
 batch_size = 48
@@ -224,9 +201,6 @@ num_train_samples = 6549
 num_valid_samples = 1595
 num_epochs = 20
 verbose = 1
-
-
-# In[17]:
 
 
 ### Image Augmentation and Geneartor
@@ -254,17 +228,6 @@ valid_generator = valid_data_gen.flow_from_directory(valid_data, (img_width, img
       
 
 
-# # Efficient Nets
-# 
-
-# In[7]:
-
-
-ls
-
-
-# In[7]:
-
 
 ### Efficient Nets ####
 
@@ -273,9 +236,6 @@ get_ipython().run_line_magic('cd', '/home/ubuntu')
 if not os.path.isdir("efficientnet_keras_transfer_learning"):
   get_ipython().system('git clone https://github.com/Tony607/efficientnet_keras_transfer_learning')
 get_ipython().run_line_magic('cd', 'efficientnet_keras_transfer_learning/')
-
-
-# In[10]:
 
 
 get_ipython().run_line_magic('cd', '/home/ubuntu/efficientnet_keras_transfer_learning')
@@ -287,14 +247,7 @@ from efficientnet import center_crop_and_resize, preprocess_input
 # loading pretrained conv base model
 conv_base = Net(weights="imagenet", include_top=False, input_shape=input_shape)
 
-
-# In[11]:
-
-
 conv_base.summary()
-
-
-# In[12]:
 
 
 ### Adding last few layers ########
@@ -313,15 +266,9 @@ if dropout_rate > 0:
 # model.add(layers.Dense(256, activation='relu', name="fc1"))
 model.add(layers.Dense(196, activation='softmax', name="fc_out"))
 
-
-# In[13]:
-
-
 model.summary()
 
-
-# In[12]:
-
+##### Freeze the Base Network ######### 
 
 print('This is the number of trainable layers '
       'before freezing the conv base:', len(model.trainable_weights))
@@ -332,29 +279,16 @@ print('This is the number of trainable layers '
       'after freezing the conv base:', len(model.trainable_weights))
 
 
-# In[14]:
-
 
 model.compile(loss='categorical_crossentropy',
               optimizer=optimizers.RMSprop(lr=1e-5),
               metrics=['acc'])
 
 
-# In[15]:
-
-
 ## Change back to working directory ####
 cd /home/ubuntu
 
-
-# In[15]:
-
-
 ls
-
-
-# In[18]:
-
 
 ## Train Model ##
 
@@ -371,15 +305,9 @@ history= model.fit_generator(
 
 # # Save model
 
-# In[63]:
-
-
-#import os
-#os.makedirs("./models", exist_ok=True)
+import os
+os.makedirs("./models", exist_ok=True)
 model.save('./cars.h5')
-
-
-# In[18]:
 
 
 from efficientnet.layers import Swish, DropConnect
@@ -392,15 +320,8 @@ get_custom_objects().update({
     'DropConnect':DropConnect
 })
 
-
-# In[26]:
-
-
-#from tensorflow.keras.models import load_model
+from tensorflow.keras.models import load_model
 model = load_model("/home/ubuntu/cars.h5")
-
-
-# In[34]:
 
 
 ## Plot Training and validation accuracy
@@ -430,10 +351,7 @@ plt.legend()
 plt.show()
 
 
-# # Fine-Tuning
-
-# In[39]:
-
+#### Fine-Tuning
 
 # multiply_16
 # set 'multiply_16' and following layers trainable
@@ -450,21 +368,7 @@ for layer in conv_base.layers:
         layer.trainable = False
 
 
-# In[40]:
-
-
-for layer in model.layers:
-    print(layer.name,' Trainable =',layer.trainable)
-
-
-# In[41]:
-
-
 model.summary()
-
-
-# In[42]:
-
 
 model.compile(loss='categorical_crossentropy',
               optimizer=optimizers.RMSprop(lr=1e-5),
@@ -483,9 +387,6 @@ history= model.fit_generator(
 
 # # Test Predict
 
-# In[54]:
-
-
 from keras.preprocessing import image
 from keras.applications.imagenet_utils import preprocess_input, decode_predictions
 import numpy as np
@@ -497,9 +398,6 @@ x = image.img_to_array(img)
 x = np.expand_dims(x, axis=0)
 x = preprocess_input(x)
 print('Input image shape:', x.shape)
-
-
-# In[57]:
 
 
 # import the necessary packages
@@ -544,9 +442,6 @@ if __name__ == '__main__':
         json.dump(results, file, indent=4)
 
     K.clear_session()
-
-
-# In[62]:
 
 
 from IPython.display import Image
